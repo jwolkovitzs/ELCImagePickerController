@@ -9,7 +9,7 @@
 
 
 @interface ELCAssetCell : UITableViewCell
-
-- (void)setAssets:(NSArray *)assets;
+@property (nonatomic) int maxInRow;
+- (void)setAssets:(NSArray *)assets withMaxInRow:(int)maxCount;
 
 @end

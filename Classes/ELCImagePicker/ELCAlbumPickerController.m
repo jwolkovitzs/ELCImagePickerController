@@ -8,6 +8,7 @@
 #import "ELCAlbumPickerController.h"
 #import "ELCImagePickerController.h"
 #import "ELCAssetTablePicker.h"
+#import "rpmImagePrivacyOnView.h"
 
 @interface ELCAlbumPickerController ()
 
@@ -25,8 +26,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	
-	[self.navigationItem setTitle:@"Loading..."];
+	self.tableView.separatorColor = [UIColor clearColor];
+	[self.navigationItem setTitle:NSLocalizedString(@"Photos", @"")];
 
     UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self.parent action:@selector(cancelImagePicker)];
 	[self.navigationItem setRightBarButtonItem:cancelButton];
@@ -66,9 +67,8 @@
             
             // Group Enumerator Failure Block
             void (^assetGroupEnumberatorFailure)(NSError *) = ^(NSError *error) {
-                
-                UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Album Error: %@ - %@", [error localizedDescription], [error localizedRecoverySuggestion]] delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                [alert show];
+                self.privacyView = [[rpmImagePrivacyOnView alloc]initWithFrame:self.view.frame];
+                [self.view addSubview:self.privacyView];
                 
                 NSLog(@"A problem occured %@", [error description]);	                                 
             };	
@@ -77,15 +77,27 @@
             [self.library enumerateGroupsWithTypes:ALAssetsGroupAll
                                    usingBlock:assetGroupEnumerator 
                                  failureBlock:assetGroupEnumberatorFailure];
-        
         }
     });    
+}
+
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    [super willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
+    if (self.privacyView)
+    {
+        [self.privacyView setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+        
+        [self.privacyView positionViewForOrientation];
+    }
 }
 
 - (void)reloadTableView
 {
 	[self.tableView reloadData];
-	[self.navigationItem setTitle:@"Select an Album"];
+    self.tableView.separatorColor = [UIColor clearColor];
+
+	[self.navigationItem setTitle:NSLocalizedString(@"Photos", @"")];
 }
 
 - (BOOL)shouldSelectAsset:(ELCAsset *)asset previousCount:(NSUInteger)previousCount
@@ -107,13 +119,11 @@
     return 1;
 }
 
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
     return [self.assetGroups count];
 }
-
 
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -149,7 +159,8 @@
     [picker.assetGroup setAssetsFilter:[ALAssetsFilter allPhotos]];
     
 	picker.assetPickerFilterDelegate = self.assetPickerFilterDelegate;
-	
+	[picker setTitle:[(ALAssetsGroup*)[self.assetGroups objectAtIndex:indexPath.row]valueForProperty:ALAssetsGroupPropertyName]
+];
 	[self.navigationController pushViewController:picker animated:YES];
 }
 

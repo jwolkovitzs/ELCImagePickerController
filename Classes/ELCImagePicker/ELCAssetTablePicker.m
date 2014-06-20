@@ -44,7 +44,7 @@
     } else {
         UIBarButtonItem *doneButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneAction:)];
         [self.navigationItem setRightBarButtonItem:doneButtonItem];
-        [self.navigationItem setTitle:@"Loading..."];
+        //[self.navigationItem setTitle:NSLocalizedString(@"Loading...", @"loading Photo")];
     }
 
 	[self performSelectorInBackground:@selector(preparePhotos) withObject:nil];
@@ -56,11 +56,6 @@
     self.columns = self.view.bounds.size.width / 80;
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
-{
-    return YES;
-}
-
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
     [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
@@ -68,12 +63,19 @@
     [self.tableView reloadData];
 }
 
+- (void)viewDidDisappear:(BOOL)animated
+{
+    if (self.navigationController.navigationBarHidden)
+    {
+        [self doneAction:nil];
+    }
+    [super viewDidDisappear:animated];
+}
+
 - (void)preparePhotos
 {
     @autoreleasepool {
-
         [self.assetGroup enumerateAssetsUsingBlock:^(ALAsset *result, NSUInteger index, BOOL *stop) {
-            
             if (result == nil) {
                 return;
             }
@@ -107,7 +109,7 @@
                                                       animated:NO];
             }
             
-            [self.navigationItem setTitle:self.singleSelection ? @"Pick Photo" : @"Pick Photos"];
+            //[self.navigationItem setTitle:self.singleSelection ? NSLocalizedString(@"Pick Photo", @"") : NSLocalizedString(@"Pick Photos", @"")];
         });
     }
 }
@@ -190,7 +192,7 @@
         cell = [[ELCAssetCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
     
-    [cell setAssets:[self assetsForIndexPath:indexPath]];
+    [cell setAssets:[self assetsForIndexPath:indexPath] withMaxInRow: self.columns];
     
     return cell;
 }

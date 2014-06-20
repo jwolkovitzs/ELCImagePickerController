@@ -28,12 +28,26 @@
  */
 - (void)elcImagePickerControllerDidCancel:(ELCImagePickerController *)picker;
 
+@optional
+/**
+ * called right after image selection done buttton is hit so you can proform any ui waiting action 
+ */
+- (void)elcImagePickerControllerDoneButtonHit:(ELCImagePickerController *)picker selectedAssets:(NSArray *)assets;
+
+/**
+ * Called only if returnIndividualImages is set to YES
+ *  Called after each image is processed to speed up the apperence for many imges being picked.
+ */
+- (void)elcImagePickerController:(ELCImagePickerController *)picker didFinishPickingMediaWithIndividualInfo:(NSDictionary *)info;
+
 @end
 
 @interface ELCImagePickerController : UINavigationController <ELCAssetSelectionDelegate>
 
 @property (nonatomic, weak) id<ELCImagePickerControllerDelegate> imagePickerDelegate;
 @property (nonatomic, assign) NSInteger maximumImagesCount;
+@property (nonatomic, assign) BOOL returnIndividualImages;
+@property (nonatomic, assign) BOOL returnRefsOnly;
 
 /**
  * YES if the picker should return the original image,

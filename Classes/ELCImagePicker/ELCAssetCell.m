@@ -36,8 +36,9 @@
 	return self;
 }
 
-- (void)setAssets:(NSArray *)assets
+- (void)setAssets:(NSArray *)assets withMaxInRow:(int)maxCount
 {
+    self.maxInRow = maxCount;
     self.rowAssets = assets;
 	for (UIImageView *view in _imageViewArray) {
         [view removeFromSuperview];
@@ -76,7 +77,7 @@
 - (void)cellTapped:(UITapGestureRecognizer *)tapRecognizer
 {
     CGPoint point = [tapRecognizer locationInView:self];
-    CGFloat totalWidth = self.rowAssets.count * 75 + (self.rowAssets.count - 1) * 4;
+    CGFloat totalWidth = self.maxInRow * 75 + (self.maxInRow - 1) * 4;
     CGFloat startX = (self.bounds.size.width - totalWidth) / 2;
     
 	CGRect frame = CGRectMake(startX, 2, 75, 75);
@@ -95,7 +96,7 @@
 
 - (void)layoutSubviews
 {    
-    CGFloat totalWidth = self.rowAssets.count * 75 + (self.rowAssets.count - 1) * 4;
+    CGFloat totalWidth = self.maxInRow * 75 + (self.maxInRow - 1) * 4;
     CGFloat startX = (self.bounds.size.width - totalWidth) / 2;
     
 	CGRect frame = CGRectMake(startX, 2, 75, 75);
